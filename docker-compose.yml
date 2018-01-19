@@ -3,7 +3,7 @@ version: '3.4'
 networks:
   proxy:
     driver: overlay
-
+    attachable: true
 
 services:
   traefik-rp:
@@ -19,7 +19,7 @@ services:
     deploy:
       # labels:
       #   - "traefik.backend=proxy"
-      #   - "traefik.frontend.rule=Host:proxy.testing.zah.me"
+      #   - "traefik.frontend.rule=Host:test.h3u.org"
       #   - "traefik.enable=true"
       #   - "traefik.port=8080"
       #   - "traefik.docker.network=web_traefik"

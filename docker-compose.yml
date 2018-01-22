@@ -18,7 +18,7 @@ services:
     - --accesslog
     - --entrypoints='Name:http Address::80 Redirect.EntryPoint:https'
     - --entryPoints='Name:https Address::443 TLS'
-    - --defaultentrypoints=http,https
+    - --defaultentrypoints=https
     - --acme
     - --acme.storage=/etc/traefik/acme/acme.json
     - --acme.OnHostRule=true

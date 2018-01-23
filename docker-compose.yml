@@ -5,29 +5,14 @@ networks:
    external:
     name: proxy
 
+configs:
+  traefik_toml:
+    external:
+     name: traefik_toml_prod_v1
+
 services:
   traefik:
-    image: traefik
-    command:  
-    - --web
-    - --docker
-    - --docker.domain=traefik
-    - --docker.swarmmode 
-    - --docker.exposedbydefault=false
-    - --logLevel=INFO
-    - --accesslog
-    - --entrypoints='Name:http Address::80 Redirect.EntryPoint:https'
-    - --entryPoints='Name:https Address::443 TLS'
-    - --defaultentrypoints=https
-    - --acme
-    - --acme.storage=/etc/traefik/acme/acme.json
-    - --acme.OnHostRule=true
-    - --acme.onDemand=false
-    - --acme.entrypoint=https
-    - --acme.email=seffyroff@gmail.com
-    - --acme.caServer='https://acme-staging.api.letsencrypt.org/directory'
-    - --acme.domains='h3u.org'
-    - --acme.domains= 'hackops.me'
+    image: traefik:1.5.0-rc5
     ports:
     - target: 80
       protocol: tcp
@@ -44,10 +29,18 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
+      - /var/tmp:/etc/traefik/acme/
     networks:
       - proxy
+    configs:
+    - source: traefik_toml
+      target: /etc/traefik/traefik.toml
+      uid: '1'
+      gid: '1'
+      mode: 0700
     deploy:
-      replicas: 2
-      placement:
-        constraints:
-          - node.role == manager
+     replicas: 1
+     placement:
+      constraints:
+      - node.role == manager
+      - node.hostname == rombus

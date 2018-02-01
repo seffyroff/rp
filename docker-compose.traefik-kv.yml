@@ -4,15 +4,22 @@ networks:
   proxy:
    external:
     name: proxy
-
-configs:
-  traefik_toml:
-    external:
-     name: traefik_toml_prod_v1
+  backend:
+   external:
+    name: backend
+  consul:
+   external:
+    name: consul-dev_consul
 
 services:
   traefik:
-    image: traefik:1.5.0-rc5
+    image: traefik:latest
+    command:
+    - "--consul"
+    - "--consul.endpoint=consul.cluster:8500"
+    - "--consul.prefix=traefik"
+    - "--consul.watch"
+    - "--acme.storage=traefik/acme/account"
     ports:
     - target: 80
       protocol: tcp
@@ -29,15 +36,10 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /etc/localtime:/etc/localtime:ro
-      - /var/tmp:/etc/traefik/acme/
     networks:
       - proxy
-    configs:
-    - source: traefik_toml
-      target: /etc/traefik/traefik.toml
-      uid: '1'
-      gid: '1'
-      mode: 0700
+      - consul
+      - backend
     deploy:
      replicas: 1
      placement:
